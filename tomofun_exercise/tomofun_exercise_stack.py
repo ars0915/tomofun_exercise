@@ -2,6 +2,7 @@ from aws_cdk import (
     Stack,
     aws_sqs as sqs,
     aws_lambda as _lambda,
+    aws_apigateway as apigateway,
     Duration,
 )
 from constructs import Construct
@@ -42,3 +43,16 @@ class TomofunExerciseStack(Stack):
         # Grant permissions to Lambda functions
         queue.grant_send_messages(post_lambda)
         queue.grant_consume_messages(get_lambda)
+
+         # Create API Gateway and connect POST and GET Lambda functions
+        api = apigateway.RestApi(self, "SQSApi",
+                                 rest_api_name="SQS Service",
+                                 description="This service sends messages to and retrieves messages from SQS.")
+
+        # Add POST method
+        post_integration = apigateway.LambdaIntegration(post_lambda)
+        api.root.add_resource("send").add_method("POST", post_integration)
+
+        # Add GET method
+        get_integration = apigateway.LambdaIntegration(get_lambda)
+        api.root.add_resource("receive").add_method("GET", get_integration) 
