@@ -1,58 +1,124 @@
+# CDK SQS API Project
 
-# Welcome to your CDK Python project!
+This project is built using AWS CDK in Python and creates an API Gateway, Lambda functions, and an SQS queue. The API allows users to send messages to and retrieve messages from an SQS queue.
 
-This is a blank project for CDK development with Python.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+## Prerequisites
 
-This project is set up like a standard Python project.  The initialization
-process also creates a virtualenv within this project, stored under the `.venv`
-directory.  To create the virtualenv it assumes that there is a `python3`
-(or `python` for Windows) executable in your path with access to the `venv`
-package. If for any reason the automatic creation of the virtualenv fails,
-you can create the virtualenv manually.
+1. **Install AWS CDK**: Make sure AWS CDK is installed. If not, install it using:
 
-To manually create a virtualenv on MacOS and Linux:
+   ```bash
+   npm install -g aws-cdk
+   ```
 
+2. **Python environment**: You need Python and virtualenv installed.
+
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+3. **Install dependencies**: Install the necessary Python dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configure AWS credentials**: Ensure your AWS CLI is configured properly. You can do this by running:
+
+   ```bash
+   aws configure
+   ```
+
+## Deployment
+
+To deploy the stack, follow these steps:
+
+1. **Synthesize the CloudFormation template**:
+
+   ```bash
+   cdk synth
+   ```
+
+2. **Deploy the stack to your AWS account**:
+
+   ```bash
+   cdk deploy
+   ```
+
+This will create:
+
+- An API Gateway
+- Two Lambda functions (for sending and retrieving messages)
+- An SQS queue
+
+Once deployed, you'll receive the API Gateway endpoint URL in the output. Use this URL to interact with the APIs.
+
+## API Documentation
+
+### POST `/send`
+
+Send a message to SQS.
+
+- **Method**: `POST`
+- **URL**: `/send`
+- **Request Body**:
+
+  ```json
+  {
+      "message": "Your message here"
+  }
+  ```
+
+- **Response**:
+
+  - `200 OK`: Message successfully sent to SQS.
+  - **Response Body**:
+
+    ```json
+    "Message sent to SQS!"
+    ```
+
+- **Example**:
+
+  ```bash
+  curl -X POST https://<api-id>.execute-api.<region>.amazonaws.com/prod/send \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Hello from API Gateway"}'
+  ```
+
+### GET `/receive`
+
+Retrieve a message from SQS.
+
+- **Method**: `GET`
+- **URL**: `/receive`
+- **Response**:
+
+  - `200 OK`: Successfully retrieved the message from SQS.
+  - **Response Body**:
+
+    ```json
+    "Your message from SQS"
+    ```
+
+  - `404 Not Found`: No messages in SQS.
+  - **Response Body**:
+
+    ```json
+    "No messages in SQS"
+    ```
+
+- **Example**:
+
+  ```bash
+  curl -X GET https://<api-id>.execute-api.<region>.amazonaws.com/prod/receive
+  ```
+
+## Cleanup
+
+To delete the stack and clean up all resources:
+
+```bash
+cdk destroy
 ```
-$ python3 -m venv .venv
-```
-
-After the init process completes and the virtualenv is created, you can use the following
-step to activate your virtualenv.
-
-```
-$ source .venv/bin/activate
-```
-
-If you are a Windows platform, you would activate the virtualenv like this:
-
-```
-% .venv\Scripts\activate.bat
-```
-
-Once the virtualenv is activated, you can install the required dependencies.
-
-```
-$ pip install -r requirements.txt
-```
-
-At this point you can now synthesize the CloudFormation template for this code.
-
-```
-$ cdk synth
-```
-
-To add additional dependencies, for example other CDK libraries, just add
-them to your `setup.py` file and rerun the `pip install -r requirements.txt`
-command.
-
-## Useful commands
-
- * `cdk ls`          list all stacks in the app
- * `cdk synth`       emits the synthesized CloudFormation template
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk docs`        open CDK documentation
-
-Enjoy!
